@@ -120,7 +120,7 @@ def fetch_book(path):
                 title = text
             elif level == 2:
                 blocks.append(_block("heading_1", text, len(blocks)))
-            elif level == 3 and PRINCIPLE_RE.match(text):
+            elif level >= 3 and PRINCIPLE_RE.match(text):
                 blocks.append(_block("heading_3", text, len(blocks)))
             else:
                 blocks.append(_block("heading_2", text, len(blocks)))
