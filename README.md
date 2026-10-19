@@ -41,5 +41,5 @@ book/Notes to Ascence.md  →  发布书籍（排版）  →  gh-pages 分支  �
 ## 发布设置
 
 - 网站由 `gh-pages` 分支提供（Settings → Pages → Deploy from a branch → `gh-pages` / root）。
-- `github-pages` 部署环境只允许 `main` 分支的显式部署工作流；页面内容仍来自 `gh-pages`。
+- `ebook-production` 部署环境只允许 `main` 分支的显式部署工作流；页面内容仍来自 `gh-pages`。旧 `github-pages` 环境保留。
 - 绑定自己的域名：域名解析好之后，把 `publish.yml` 里的 `SITE_URL` 改成 `https://sylway.cloud`，下次发布会自动生成 CNAME。
