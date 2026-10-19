@@ -17,8 +17,8 @@ book/Notes to Ascence.md  →  GitHub Actions  →  排版成网页  →  gh-pag
 | Markdown 里 | 书里 |
 | --- | --- |
 | 文档标题 `# 一霁千山` | 书名 |
-| 二级标题 `## 第一部　自在从容，方能长久` | 一章，拆分为章序与章名 |
-| 标题为 `## 序`、`## 尾声　……`、`## 附录` | 序、尾声、附录 |
+| 二级标题 `## 第一章　自在从容，方能长久` | 一章，拆分为章序与章名 |
+| 标题为 `## 序`、`## 尾声　……` | 序或尾声 |
 | 三级标题 `### 01｜排除时尚，不是反时尚` | Doctrine 条目（大号序号 + 标题） |
 | 四级标题 | Doctrine 内的小节标题，同时进入目录 |
 | 整段加粗 | 引句 |
@@ -28,7 +28,7 @@ book/Notes to Ascence.md  →  GitHub Actions  →  排版成网页  →  gh-pag
 
 ## 文件
 
-- `book/Notes to Ascence.md` 正式书稿；`founder/` 原始手记存档
+- `book/Notes to Ascence.md` 正式书稿
 - `scripts/build.py` 排版生成器；`scripts/markdown_source.py` 读取 Markdown；`scripts/fonts.py` 字体裁剪
 - `theme/style.css` 书籍样式；`theme/reader.js` 阅读交互（顶栏、进度、字号、夜读、记住读到哪里）
 - `assets/cover.jpg.b64` 封面图片

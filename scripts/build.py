@@ -26,7 +26,7 @@ sys.path.insert(0, HERE)
 from fonts import build_fonts  # noqa: E402
 
 TZ = datetime.timezone(datetime.timedelta(hours=8))
-LABEL_RE = re.compile(r"^(第[^\s　]{1,6}[章节部篇卷回]|序|序言|自序|前言|引言|楔子|尾声|后记|跋|结语|附录)$")
+LABEL_RE = re.compile(r"^(第[^\s　]{1,6}[章节部篇卷回]|序|序言|自序|前言|引言|楔子|尾声|后记|跋|结语)$")
 PRINCIPLE_RE = re.compile(r"^\s*(\d{1,2})\s*[｜|丨]\s*(.+)$")
 
 
@@ -347,7 +347,7 @@ def parse_root(book):
             kind = "coda"
         elif label in ("序", "序言", "自序", "前言", "引言", "楔子"):
             kind = "preface"
-        elif label == "附录" or ch["group"]:
+        elif ch["group"]:
             kind = "appendix"
         else:
             kind = "chapter"
@@ -462,9 +462,6 @@ def build(book, out, font_src=None, site_url=""):
     write(os.path.join(out, "style.css"), css)
     shutil.copy(os.path.join(ROOT, "theme", "reader.js"), os.path.join(out, "reader.js"))
     shutil.copy(os.path.join(ROOT, "theme", "favicon.svg"), os.path.join(out, "favicon.svg"))
-    archive_src = os.path.join(ROOT, "founder")
-    if os.path.isdir(archive_src):
-        shutil.copytree(archive_src, os.path.join(out, "archive"), dirs_exist_ok=True)
     preload = [f"fonts/{f}" for f in sorted(os.listdir(os.path.join(out, "fonts")))
                if f.startswith("serif-400")] if os.path.isdir(os.path.join(out, "fonts")) else []
     css_href = f"style.css?v={ver}"

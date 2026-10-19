@@ -45,8 +45,6 @@ def rich_text(markdown):
         link = LINK_RE.fullmatch(token)
         if link:
             label, href = link.groups()
-            if href.startswith("../founder/"):
-                href = "archive/" + href.rsplit("/", 1)[-1]
             out.append(_run(label, href=href))
         elif token.startswith("**"):
             out.append(_run(token[2:-2], bold=True))
