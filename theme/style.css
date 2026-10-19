@@ -125,6 +125,11 @@ html[data-theme="night"] .book{box-shadow:0 30px 70px -30px rgba(0,0,0,.8)}
 .go{text-decoration:none;color:var(--ink2);padding-bottom:.35rem;border-bottom:1px solid var(--rule);text-indent:.45em;transition:border-color .4s,color .4s}
 .go:hover{border-color:var(--ink2)}
 
+html:has(body.home){scroll-behavior:smooth}
+.resume{margin-top:-1.2rem;font-size:.7rem;letter-spacing:.2em;color:var(--muted);text-decoration:none}
+.resume[hidden]{display:none}
+.resume:hover{color:var(--ink2)}
+.toc-screen .turn{margin:5rem 0 clamp(5rem,14vh,8rem)}
 .title-screen{position:relative;min-height:100vh;min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:4rem 1.5rem}
 .title-screen h1{margin:0;font-weight:400;font-size:2.1rem;line-height:1.5;letter-spacing:.32em;text-indent:.32em}
 .title-screen .en{margin-top:1rem;font-family:var(--latin);font-style:italic;font-size:1.08rem;color:var(--ink2);letter-spacing:.03em}

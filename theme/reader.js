@@ -21,9 +21,9 @@
     try {
       var last = JSON.parse(store.get('as-last') || 'null');
       var r = document.querySelector('.resume');
-      if (last && last.p && r && last.r > 0.02 && document.querySelector('a[href="' + last.p + '"]')) {
+      if (last && last.p && r && last.r > 0.02 && last.r < 0.98 && document.querySelector('a[href="' + last.p + '"]')) {
         r.href = last.p + '#resume';
-        r.title = last.t || '';
+        r.querySelector('span').textContent = last.t ? '：' + last.t : '';
         r.hidden = false;
       }
     } catch (e) {}

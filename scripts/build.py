@@ -489,6 +489,7 @@ def build(book, out, font_src=None, site_url=""):
             toc.append(f'<div class="subs">{subs}</div>')
 
     first = chapters[0]["slug"] if chapters else "#toc"
+    first_name = (chapters[0]["name"] or chapters[0]["label"] or chapters[0]["page"].get("title", "")) if chapters else ""
     status = foot_status or ""
     y_line = "　·　".join(x for x in [status, f"最后更新于 {cn_date(updated)}"] if x)
     home = head(f"{title} · {subtitle}" if subtitle else title, desc, css_href, preload, og_image=og) + f"""<body class="home">
@@ -497,7 +498,8 @@ def build(book, out, font_src=None, site_url=""):
     <span class="book-t"><span class="book-h">{esc(title)}</span><span class="book-en">{esc(subtitle.upper())}</span></span>
     {f'<span class="book-b">{esc(info["author"])}</span>' if info["author"] else ''}
   </a>
-  <div class="begin"><a class="go" href="{first}">开始阅读</a><a class="go resume" href="#" hidden>继续阅读</a></div>
+  <div class="begin"><a class="go" href="#title">翻开</a></div>
+  <a class="resume" href="#" hidden>接着上次读<span></span></a>
 </section>
 <section class="title-screen reveal" id="title">
   <h1>{esc(title)}</h1>
@@ -509,7 +511,9 @@ def build(book, out, font_src=None, site_url=""):
 <section class="epi-screen reveal" aria-label="题诗"><p class="verse-v">{verse}</p></section>
 <section class="toc-screen reveal" id="toc"><h2>目录</h2><nav class="toc">
 {chr(10).join(toc)}
-</nav></section>
+</nav>
+<nav class="turn"><a class="next" href="{first}" rel="next"><small>开始阅读</small><span>{esc(first_name)}</span></a></nav>
+</section>
 {colophon(info)}
 <script src="reader.js" defer></script>
 </body>
@@ -527,9 +531,13 @@ def build(book, out, font_src=None, site_url=""):
 
         turn = '<nav class="turn">'
         if prev:
-            turn += f'<a class="prev" href="{prev["slug"]}" rel="prev"><small>上一章</small><span>{esc(short(prev))}</span></a>'
+            turn += f'<a class="prev" href="{prev["slug"]}" rel="prev"><small>上一页</small><span>{esc(short(prev))}</span></a>'
+        else:
+            turn += '<a class="prev" href="index.html#toc" rel="prev"><small>上一页</small><span>目录</span></a>'
         if nxt:
-            turn += f'<a class="next" href="{nxt["slug"]}" rel="next"><small>下一章</small><span>{esc(short(nxt))}</span></a>'
+            turn += f'<a class="next" href="{nxt["slug"]}" rel="next"><small>下一页</small><span>{esc(short(nxt))}</span></a>'
+        else:
+            turn += '<a class="next" href="index.html" rel="next"><small>读完了</small><span>合上书</span></a>'
         turn += "</nav>"
         if ch["name"]:
             opener = f'<div class="clabel">{esc(ch["label"])}</div><h1>{esc(ch["name"])}</h1>'
@@ -546,7 +554,6 @@ def build(book, out, font_src=None, site_url=""):
 </article>
 <div class="fin" aria-hidden="true"></div>
 {turn}
-<a class="tocl" href="index.html#toc">目录</a>
 </main>
 {colophon(info)}
 <script src="reader.js" defer></script>
