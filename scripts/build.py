@@ -296,8 +296,27 @@ def parse_root(book):
     info = {"title": book.get("title") or "一霁千山", "subtitle": "", "epigraph": "",
             "footer": "", "author": "", "intro": [], "chapters": []}
     group, seen_page, pending = None, False, []
+    cur = None  # 正文直接写在主页面里：每个一级标题是一章，分隔线结束正文
     for b in book.get("blocks", []):
         t = b.get("type")
+        if t == "heading_1":
+            title = plain(b[t]["rich_text"]).strip()
+            if title:
+                if seen_page and pending and cur is None:
+                    group = pending[-1]
+                pending = []
+                seen_page = True
+                cur = {"id": b["id"], "title": title, "blocks": []}
+                info["chapters"].append({"page": cur, "group": group, "id": b["id"]})
+            continue
+        if cur is not None:
+            if t == "divider":
+                cur = None
+            elif t != "child_page":
+                cur["blocks"].append(b)
+                continue
+            else:
+                cur = None
         if t == "child_page" and b.get("page"):
             if seen_page and pending:
                 group = pending[-1]
