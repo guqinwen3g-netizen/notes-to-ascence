@@ -1,0 +1,49 @@
+name: 部署电子书
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [gh-pages]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-direct
+  cancel-in-progress: true
+
+jobs:
+  package:
+    if: github.ref == 'refs/heads/gh-pages'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 检查页面文件
+        run: |
+          test -s index.html
+          test -s chapter-1.html
+          test -s hash.txt
+
+      - name: 上传电子书页面
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+  deploy:
+    needs: package
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: 部署到 GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        with:
+          timeout: 180000

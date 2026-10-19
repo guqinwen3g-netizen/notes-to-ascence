@@ -5,12 +5,13 @@
 ## 它是怎么运转的
 
 ```
-book/Notes to Ascence.md  →  GitHub Actions  →  排版成网页  →  gh-pages 分支  →  网站
+book/Notes to Ascence.md  →  发布书籍（排版）  →  gh-pages 分支  →  部署电子书（上线）  →  网站
 ```
 
 - 更新 `book/Notes to Ascence.md` 并推送到 `main` 后，网站会自动更新。
 - 需要重新发布时，也可以打开本仓库 **Actions → 发布书籍 → Run workflow**。
-- 内容没有变化时不会重复发布。
+- 页面已经生成、仅需重试上线时，可运行 **Actions → 部署电子书 → Run workflow**，分支选择 `gh-pages`。部署步骤成功后，再核对公开页面的正文。
+- 自动更新会跳过正文和部署配置均未变化的版本；手动运行可以重试部署。
 
 ## Markdown 怎么写，书里就怎么排
 
@@ -33,6 +34,7 @@ book/Notes to Ascence.md  →  GitHub Actions  →  排版成网页  →  gh-pag
 - `theme/style.css` 书籍样式；`theme/reader.js` 阅读交互（顶栏、进度、字号、夜读、记住读到哪里）
 - `assets/cover.jpg.b64` 封面图片
 - `.github/workflows/publish.yml` 自动发布
+- `.github/workflows/deploy-pages.yml` 上传页面并执行 GitHub Pages 部署；随生成的页面保存在 `gh-pages` 分支中
 
 字体：正文为思源宋体（Noto Serif SC），西文为 EB Garamond，均为开源字体（SIL OFL）。构建时只保留书中用到的字，网页加载很快。
 
