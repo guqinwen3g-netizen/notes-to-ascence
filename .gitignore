@@ -1,0 +1,4 @@
+_site/
+.fontsrc/
+__pycache__/
+*.pyc
