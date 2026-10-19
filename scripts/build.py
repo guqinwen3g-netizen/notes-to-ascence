@@ -294,7 +294,7 @@ def split_title(title, group):
 
 def parse_root(book):
     info = {"title": book.get("title") or "一霁千山", "subtitle": "", "epigraph": "",
-            "footer": "", "intro": [], "chapters": []}
+            "footer": "", "author": "", "intro": [], "chapters": []}
     group, seen_page, pending = None, False, []
     for b in book.get("blocks", []):
         t = b.get("type")
@@ -313,6 +313,8 @@ def parse_root(book):
             if not seen_page:
                 if not info["subtitle"]:
                     info["subtitle"] = txt
+                elif not info["author"]:
+                    info["author"] = txt
                 else:
                     info["intro"].append(txt)
             else:
@@ -340,6 +342,9 @@ def parse_root(book):
 
 # ---------------------------------------------------------------- 页面
 
+AUTHOR = ""
+
+
 def head(title, desc, css_href, fonts_preload, theme_color="#FBFAF7", og_image=""):
     pre = "".join(
         f'<link rel="preload" href="{f}" as="font" type="font/{f.rsplit(".", 1)[1]}" crossorigin>'
@@ -352,6 +357,7 @@ def head(title, desc, css_href, fonts_preload, theme_color="#FBFAF7", og_image="
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{esc(title)}</title>
 <meta name="description" content="{esc(desc)}">
+{f'<meta name="author" content="{esc(AUTHOR)}">' if AUTHOR else ''}
 <meta name="theme-color" content="{theme_color}">
 <meta property="og:type" content="book">
 <meta property="og:title" content="{esc(title)}">
@@ -371,9 +377,13 @@ PANEL = """<div class="panel" role="dialog" aria-label="阅读设置" hidden>
 </div>"""
 
 
+def author_name(info):
+    return (info.get("author") or "").strip()
+
+
 def colophon(info):
-    foot = info["footer"] or ""
-    return (f'<footer class="colophon"><div>{esc(info["title"])}</div>'
+    a = f'<div>{esc(info["author"])}</div>' if info.get("author") else ""
+    return (f'<footer class="colophon"><div>{esc(info["title"])}</div>{a}'
             f'<div class="en">{esc(info["subtitle"])}</div></footer>')
 
 
@@ -386,7 +396,9 @@ def build(book, out, font_src=None, site_url=""):
     if os.path.isdir(out):
         shutil.rmtree(out)
     os.makedirs(out)
+    global AUTHOR
     info = parse_root(book)
+    AUTHOR = author_name(info)
     chapters = info["chapters"]
     links = {ch["id"].replace("-", ""): ch["slug"] for ch in chapters}
     for ch in chapters:
@@ -416,7 +428,7 @@ def build(book, out, font_src=None, site_url=""):
     foot_main, foot_status = foot_main.strip(" 　"), foot_status.strip(" 　")
 
     # 首页 / 目录里会出现的文字也要进字体
-    shell_text = [title, subtitle, epi, foot, cn_date(updated), "目录目　录开始阅读继续阅读分钟上一章下一章回到目录最后更新于字号底色纸夜阅读设置附录此页不存在回到封面翻开"]
+    shell_text = [title, subtitle, epi, foot, info["author"], cn_date(updated), "目录目　录开始阅读继续阅读分钟上一章下一章回到目录最后更新于字号底色纸夜阅读设置附录此页不存在回到封面翻开"]
     for ch in chapters:
         shell_text += [ch["label"], ch["name"], ch["page"].get("title", "")] + ch["sections"]
     all_text += shell_text
@@ -480,7 +492,7 @@ def build(book, out, font_src=None, site_url=""):
     home = head(f"{title} · {subtitle}" if subtitle else title, desc, css_href, preload, og_image=og) + f"""<body class="home">
 <section class="cover-screen">
   <a class="book" href="#title" aria-label="翻开 {esc(title)}">
-    <span class="book-t"><span class="book-h">{esc(title)}</span><span class="book-en">{esc(subtitle.upper())}</span></span>
+    <span class="book-t"><span class="book-h">{esc(title)}</span><span class="book-en">{esc(subtitle.upper())}</span>{f'<span class="book-a">{esc(info["author"])}</span>' if info["author"] else ''}</span>
     <span class="book-b">ASCENCE</span>
   </a>
   <div class="begin"><a class="go" href="{first}">开始阅读</a><a class="go resume" href="#" hidden>继续阅读</a></div>
@@ -489,6 +501,7 @@ def build(book, out, font_src=None, site_url=""):
   <h1>{esc(title)}</h1>
   <div class="en">{esc(subtitle)}</div>
   <div class="rule"></div>
+  {f'<div class="a">{esc(info["author"])}</div>' if info["author"] else ''}
   <div class="s">{esc(foot_main)}</div>
   <div class="y">{esc(y_line)}</div>
 </section>
