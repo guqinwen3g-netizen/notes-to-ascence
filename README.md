@@ -5,13 +5,12 @@
 ## 它是怎么运转的
 
 ```
-book/Notes to Ascence.md  →  发布书籍（排版）  →  gh-pages 分支  →  部署电子书（上线）  →  网站
+book/Notes to Ascence.md  →  GitHub Actions  →  排版成网页  →  gh-pages 分支  →  网站
 ```
 
 - 更新 `book/Notes to Ascence.md` 并推送到 `main` 后，网站会自动更新。
 - 需要重新发布时，也可以打开本仓库 **Actions → 发布书籍 → Run workflow**。
-- 页面已经生成、仅需重试上线时，可运行 **Actions → 部署电子书 → Run workflow**，分支选择 `main`；任务会读取 `gh-pages` 中已生成的页面。部署步骤成功后，再核对公开页面的正文。
-- 自动更新会跳过正文未变化的版本；手动运行可以重试部署。
+- 内容没有变化时不会重复发布。
 
 ## Markdown 怎么写，书里就怎么排
 
@@ -34,12 +33,10 @@ book/Notes to Ascence.md  →  发布书籍（排版）  →  gh-pages 分支  �
 - `theme/style.css` 书籍样式；`theme/reader.js` 阅读交互（顶栏、进度、字号、夜读、记住读到哪里）
 - `assets/cover.jpg.b64` 封面图片
 - `.github/workflows/publish.yml` 自动发布
-- `.github/workflows/deploy-pages.yml` 从 `main` 启动，读取 `gh-pages` 的页面并执行 GitHub Pages 部署
 
 字体：正文为思源宋体（Noto Serif SC），西文为 EB Garamond，均为开源字体（SIL OFL）。构建时只保留书中用到的字，网页加载很快。
 
 ## 发布设置
 
 - 网站由 `gh-pages` 分支提供（Settings → Pages → Deploy from a branch → `gh-pages` / root）。
-- `ebook-production` 部署环境只允许 `main` 分支的显式部署工作流；页面内容仍来自 `gh-pages`。旧 `github-pages` 环境保留。
 - 绑定自己的域名：域名解析好之后，把 `publish.yml` 里的 `SITE_URL` 改成 `https://sylway.cloud`，下次发布会自动生成 CNAME。
