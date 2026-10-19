@@ -426,6 +426,8 @@ def build(book, out, font_src=None, site_url=""):
     foot = info["footer"]
     foot_main, foot_status = (foot.split("·", 1) + [""])[:2] if "·" in foot else (foot, "")
     foot_main, foot_status = foot_main.strip(" 　"), foot_status.strip(" 　")
+    if not foot_status:  # 页脚只写了状态（如「持续书写中」）
+        foot_main, foot_status = "", foot_main
 
     # 首页 / 目录里会出现的文字也要进字体
     shell_text = [title, subtitle, epi, foot, info["author"], cn_date(updated), "目录目　录开始阅读继续阅读分钟上一章下一章回到目录最后更新于字号底色纸夜阅读设置附录此页不存在回到封面翻开"]
@@ -493,7 +495,6 @@ def build(book, out, font_src=None, site_url=""):
 <section class="cover-screen">
   <a class="book" href="#title" aria-label="翻开 {esc(title)}">
     <span class="book-t"><span class="book-h">{esc(title)}</span><span class="book-en">{esc(subtitle.upper())}</span>{f'<span class="book-a">{esc(info["author"])}</span>' if info["author"] else ''}</span>
-    <span class="book-b">ASCENCE</span>
   </a>
   <div class="begin"><a class="go" href="{first}">开始阅读</a><a class="go resume" href="#" hidden>继续阅读</a></div>
 </section>
@@ -502,7 +503,6 @@ def build(book, out, font_src=None, site_url=""):
   <div class="en">{esc(subtitle)}</div>
   <div class="rule"></div>
   {f'<div class="a">{esc(info["author"])}</div>' if info["author"] else ''}
-  <div class="s">{esc(foot_main)}</div>
   <div class="y">{esc(y_line)}</div>
 </section>
 <section class="epi-screen reveal" aria-label="题诗"><p class="verse-v">{verse}</p></section>
