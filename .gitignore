@@ -1,4 +1,5 @@
 _site/
 .fontsrc/
 __pycache__/
+.playwright-cli/
 *.pyc

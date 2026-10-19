@@ -1,9 +1,7 @@
 name: 发布书籍
 
 on:
-  schedule:
-    - cron: "*/30 * * * *"   # 每 30 分钟检查一次 Notion 是否有更新
-  workflow_dispatch:          # 也可以在 Actions 页面手动点「Run workflow」立即更新
+  workflow_dispatch:
   push:
     branches: [main]
 
@@ -16,7 +14,6 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  NOTION_ROOT_PAGE: 902723b65e874ddd8e90dd5f58c56ef1
   # 绑定 sylway.cloud 之后，把这里改成 https://sylway.cloud
   SITE_URL: https://guqinwen3g-netizen.github.io/notes-to-ascence
 
@@ -24,50 +21,29 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - name: 检查 Notion 密钥
-        id: token
-        env:
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-        run: |
-          if [ -z "$NOTION_TOKEN" ]; then
-            echo "::warning::还没有设置 NOTION_TOKEN（Settings → Secrets and variables → Actions），本次跳过。"
-            echo "ok=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "ok=true" >> "$GITHUB_OUTPUT"
-          fi
-
       - uses: actions/checkout@v4
-        if: steps.token.outputs.ok == 'true'
 
       - uses: actions/setup-python@v5
-        if: steps.token.outputs.ok == 'true'
         with:
           python-version: "3.12"
 
       - name: 安装工具
-        if: steps.token.outputs.ok == 'true'
         run: pip install -q fonttools brotli pillow
 
       - name: 缓存字体
-        if: steps.token.outputs.ok == 'true'
         uses: actions/cache@v4
         with:
           path: .fontsrc
           key: fontsrc-v1
 
       - name: 准备字体
-        if: steps.token.outputs.ok == 'true'
         run: bash scripts/fetch_fonts.sh .fontsrc
 
-      - name: 从 Notion 读取并排版
-        if: steps.token.outputs.ok == 'true'
-        env:
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-        run: python scripts/build.py --out _site --fonts .fontsrc
+      - name: 从 Markdown 读取并排版
+        run: python scripts/build.py --markdown "book/Notes to Ascence.md" --out _site --fonts .fontsrc
 
       - name: 内容是否有变化
         id: check
-        if: steps.token.outputs.ok == 'true'
         run: |
           new=$(cat _site/hash.txt)
           old=""
@@ -91,10 +67,3 @@ jobs:
           user_name: "github-actions[bot]"
           user_email: "github-actions[bot]@users.noreply.github.com"
           commit_message: "更新书籍"
-
-      # GitHub 会在仓库 60 天无活动后停用定时任务，这一步让它保持运行
-      - name: 保持定时任务
-        if: github.event_name == 'schedule'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/publish.yml/enable" || true

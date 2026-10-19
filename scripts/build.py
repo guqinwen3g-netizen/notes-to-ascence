@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """一霁千山 · 书籍版生成器
 
-读取 Notion 里的书稿，排版成一本可以在网页上阅读的书。
+读取仓库里的 Markdown 书稿，排版成一本可以在网页上阅读的书。
 
-  python scripts/build.py --out _site                 # 从 Notion 读取（需要 NOTION_TOKEN）
+  python scripts/build.py --out _site
+  python scripts/build.py --markdown "book/Notes to Ascence.md" --out _site
   python scripts/build.py --tree book.json --out _site  # 从本地 JSON 读取（调试用）
 """
 import argparse
@@ -24,9 +25,8 @@ ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 from fonts import build_fonts  # noqa: E402
 
-DEFAULT_ROOT_PAGE = "902723b65e874ddd8e90dd5f58c56ef1"
 TZ = datetime.timezone(datetime.timedelta(hours=8))
-LABEL_RE = re.compile(r"^(第[^\s　]{1,6}[章节部篇卷回]|序|序言|自序|前言|引言|楔子|尾声|后记|跋|结语)$")
+LABEL_RE = re.compile(r"^(第[^\s　]{1,6}[章节部篇卷回]|序|序言|自序|前言|引言|楔子|尾声|后记|跋|结语|附录)$")
 PRINCIPLE_RE = re.compile(r"^\s*(\d{1,2})\s*[｜|丨]\s*(.+)$")
 
 
@@ -347,7 +347,7 @@ def parse_root(book):
             kind = "coda"
         elif label in ("序", "序言", "自序", "前言", "引言", "楔子"):
             kind = "preface"
-        elif ch["group"]:
+        elif label == "附录" or ch["group"]:
             kind = "appendix"
         else:
             kind = "chapter"
@@ -462,6 +462,9 @@ def build(book, out, font_src=None, site_url=""):
     write(os.path.join(out, "style.css"), css)
     shutil.copy(os.path.join(ROOT, "theme", "reader.js"), os.path.join(out, "reader.js"))
     shutil.copy(os.path.join(ROOT, "theme", "favicon.svg"), os.path.join(out, "favicon.svg"))
+    archive_src = os.path.join(ROOT, "founder")
+    if os.path.isdir(archive_src):
+        shutil.copytree(archive_src, os.path.join(out, "archive"), dirs_exist_ok=True)
     preload = [f"fonts/{f}" for f in sorted(os.listdir(os.path.join(out, "fonts")))
                if f.startswith("serif-400")] if os.path.isdir(os.path.join(out, "fonts")) else []
     css_href = f"style.css?v={ver}"
@@ -605,21 +608,16 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="_site")
     ap.add_argument("--tree", help="本地 JSON（调试用）")
+    ap.add_argument("--markdown", default=os.path.join(ROOT, "book", "Notes to Ascence.md"),
+                    help="Markdown 书稿路径")
     ap.add_argument("--fonts", help="字体源文件目录")
-    ap.add_argument("--save-tree", help="把从 Notion 读到的内容另存为 JSON")
     args = ap.parse_args()
     site_url = os.environ.get("SITE_URL", "")
     if args.tree:
         book = json.load(open(args.tree, encoding="utf-8"))
     else:
-        token = os.environ.get("NOTION_TOKEN")
-        if not token:
-            raise SystemExit("缺少 NOTION_TOKEN：请在 GitHub 仓库 Settings → Secrets → Actions 里添加。")
-        from notion import fetch_book
-        root = (os.environ.get("NOTION_ROOT_PAGE") or DEFAULT_ROOT_PAGE).strip()
-        book = fetch_book(token, root)
-        if args.save_tree:
-            json.dump(book, open(args.save_tree, "w", encoding="utf-8"), ensure_ascii=False)
+        from markdown_source import fetch_book
+        book = fetch_book(args.markdown)
     build(book, args.out, args.fonts, site_url)
 
 
