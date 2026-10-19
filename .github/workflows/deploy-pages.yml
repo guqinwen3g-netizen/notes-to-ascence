@@ -2,8 +2,6 @@ name: 部署电子书
 
 on:
   workflow_dispatch:
-  push:
-    branches: [gh-pages]
 
 permissions:
   contents: read
@@ -14,11 +12,13 @@ concurrency:
 
 jobs:
   package:
-    if: github.ref == 'refs/heads/gh-pages'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
 
       - name: 检查页面文件
         run: |

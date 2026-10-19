@@ -42,11 +42,6 @@ jobs:
       - name: 从 Markdown 读取并排版
         run: python scripts/build.py --markdown "book/Notes to Ascence.md" --out _site --fonts .fontsrc
 
-      - name: 随页面保存部署工作流
-        run: |
-          mkdir -p _site/.github/workflows
-          cp .github/workflows/deploy-pages.yml _site/.github/workflows/deploy-pages.yml
-
       - name: 内容是否有变化
         id: check
         run: |
@@ -55,11 +50,7 @@ jobs:
           if git fetch -q --depth=1 origin gh-pages 2>/dev/null; then
             old=$(git show FETCH_HEAD:hash.txt 2>/dev/null || true)
           fi
-          workflow_unchanged=false
-          if git show FETCH_HEAD:.github/workflows/deploy-pages.yml 2>/dev/null | cmp -s - .github/workflows/deploy-pages.yml; then
-            workflow_unchanged=true
-          fi
-          if [ "$new" = "$old" ] && [ "$workflow_unchanged" = true ]; then
+          if [ "$new" = "$old" ]; then
             echo "内容没有变化，跳过发布"; echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
@@ -81,4 +72,4 @@ jobs:
         if: steps.check.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh workflow run deploy-pages.yml --ref gh-pages
+        run: gh workflow run deploy-pages.yml --ref main
