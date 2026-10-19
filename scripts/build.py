@@ -494,7 +494,8 @@ def build(book, out, font_src=None, site_url=""):
     home = head(f"{title} · {subtitle}" if subtitle else title, desc, css_href, preload, og_image=og) + f"""<body class="home">
 <section class="cover-screen">
   <a class="book" href="#title" aria-label="翻开 {esc(title)}">
-    <span class="book-t"><span class="book-h">{esc(title)}</span><span class="book-en">{esc(subtitle.upper())}</span>{f'<span class="book-a">{esc(info["author"])}</span>' if info["author"] else ''}</span>
+    <span class="book-t"><span class="book-h">{esc(title)}</span><span class="book-en">{esc(subtitle.upper())}</span></span>
+    {f'<span class="book-b">{esc(info["author"])}</span>' if info["author"] else ''}
   </a>
   <div class="begin"><a class="go" href="{first}">开始阅读</a><a class="go resume" href="#" hidden>继续阅读</a></div>
 </section>
